@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<script>
+	function check($str){
+		preg = /\d{0,2}/;
+		if(preg.exec($str)){
+			alert('yes');
+		}else{
+			alert('no');
+		}
+
+	}
+</script>
+<body>
+	<form action="">
+		<input type="text" onblur="check(this.value)">
+	</form>
+
+</body>
+</html>
+
+<p>北京<a href="http://www.baidu.com">百度搜素引擎</a></p>
+<h1><a href="http://www.ku6.com">酷六</a>视频网站</h1>

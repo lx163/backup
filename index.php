@@ -1,0 +1,11 @@
+<?php 
+header("Content-Type:text/html;charset=utf-8");
+// 
+echo "ÄãºÃ°¡°¡°¡°¡°¡";
+
+$a = "www.houdunwang.com234";
+echo preg_match("/\.com[^\d]/",$a,$arr)?"Æ¥Åä":"²»Æ¥Åä";
+echo '<br>';
+var_dump($arr);
+
+ ?>
