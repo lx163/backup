@@ -2,10 +2,9 @@
 
 /*
 
-实现的功能：
-
-1、zy_keyword中的关键词，在迅搜中（zy_article索引）搜索，把搜索结果的ID放到zy_keyword表的list字段。
-2、搜索结果取前50个
+功能：给zy_article表加上匹配文章（list）值。
+list格式：“'aid|ctry|title','aid|ctry|title'”,因为组成一个url需要这3个要素,使用时用两次explode进行数据分解。
+算法：迅搜
 ------------------- 
 搜索的返回值是一个XSDocumentd的对象，取值方式：
 取字段  $doc->title 或者 $doc['title']
@@ -32,26 +31,34 @@ $conn = new mysqli("localhost","root","root","zhiyue");
 if($conn->connect_error){
 	die("连接失败".$conn->connect_error);
 }
-$words = $conn->query("select word from zy_keyword");
+$titles = $conn->query("select aid,title from zy_article");
 
 /*逐行处理关键词*/ 
 
- while($row = $words->fetch_array()){
- 	// var_dump($row[0]);
- 	$docs = $xs->search->setLimit(50)->setQuery($row[0])->search();
+ while($row = $titles->fetch_array()){
+ 	// setFuzzy() 设置模糊搜索
+ 	
+ 	$docs = $xs->search->setFuzzy()->setLimit(20)->setQuery($row[1])->search();
 
 	$list_arr = array();
+	$list_arr_name = array();
 
 	//把搜索结果的id值压入数组
 	foreach($docs as $doc):
-		array_push($list_arr,$doc->Id);
+		if($doc->title != $row[1]){
+			array_push($list_arr,$doc->aid.'||'.$doc->ctry.'||'.$doc->title);//||作为分隔符
+			// array_push($list_arr_name,$doc->title);
+
+		}		
 	endforeach;
-	$list = implode(',',$list_arr);//数组拆成字符串
+	$list = implode('@#',$list_arr);//数组拆成字符串,@#作为分隔符。
+	// $list_name = implode(',',$list_arr_name);
+
     // 搜索结果不为0的，加入数据库
 	if($list){
 		// echo $row[0];var_dump($list);
-		$conn->query("update zy_keyword set list ='{$list}' where word = '{$row[0]}'");
+		$conn->query("update zy_article set list ='{$list}' where aid = {$row[0]}");
 	}
-	echo $row[0].' '.count($list_arr).'<br>';
+	echo $row[1].' '.count($list_arr).'<br>';
  }
  ?>
